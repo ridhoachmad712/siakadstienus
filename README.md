@@ -1,59 +1,26 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SIAKAD STIE Nusantara
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi akademik berbasis PHP native dan MariaDB/MySQL, dengan peran admin, program studi, dosen, dan mahasiswa.
 
-## About Laravel
+## Menjalankan aplikasi
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. Siapkan PHP 8.3 dengan MySQLi, serta MariaDB/MySQL dan Apache dengan mod_rewrite.
+2. Pulihkan database kampus dari backup privat. Repository ini tidak memuat data mahasiswa, foto, password akun, atau kredensial koneksi.
+3. Salin `config/db_config.sample.php` menjadi `config/db_config.php`, lalu isi koneksi database tujuan.
+4. Setelah backup dan pemeriksaan staging, jalankan migrasi yang diperlukan dalam `database/migrations/`. Untuk pembatasan semester KRS, jalankan `2026-10-03_krs_semester.sql` sebelum menggunakan kode ini. Migrasi integritas akademik menolak data ganda atau relasi KRS/KHS yang tidak konsisten dan tidak merapikannya otomatis.
+5. Buka halaman `pages/login` dari URL aplikasi dan masuk dengan akun pada database yang dipulihkan.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+`database/schema.sql` berisi struktur awal tanpa data dan digunakan oleh pengujian. Database kosong belum memiliki akun atau pengaturan operasional. File unggahan foto dan konfigurasi koneksi disiapkan terpisah pada server.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Perubahan aplikasi
 
-## Learning Laravel
+- Tema maroon dan layout responsif untuk halaman akademik, profil, serta cetak.
+- Otorisasi per peran, CSRF, password modern dengan dukungan migrasi login lama, dan transaksi akademik.
+- Pilihan KRS berdasarkan semester mahasiswa; izin mengulang/semester atas dan penetapan semester khusus oleh prodi.
+- Riwayat alasan dan petugas untuk pengaturan KRS. KRS/KHS lama dipertahankan untuk peninjauan.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Petunjuk fitur KRS: [docs/KRS_SEMESTER.md](docs/KRS_SEMESTER.md). Dokumentasi tampilan: [docs/UI_UX_MAROON.md](docs/UI_UX_MAROON.md).
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Pengujian
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Jalankan `python tests/run_security_tests.py --mysql-bin C:/xampp/mysql/bin --ui` dengan PHP tersedia di PATH serta Node.js dan Playwright tersedia untuk pemeriksaan browser. Runner memakai database sementara dan data sintetis, tanpa mengakses database operasional. Validasi terakhir: 72 pemeriksaan integrasi, 134 pemeriksaan browser, dan 42 pemeriksaan HTTP/migrasi.

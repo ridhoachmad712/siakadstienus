@@ -1,0 +1,23 @@
+# Blokir akses langsung ke berkas data (hasil upload/arsip import) yang
+# terlanjur tersimpan di dalam folder pages/. Berkas ini berisi data pribadi
+# mahasiswa dan dosen, sehingga tidak boleh bisa diunduh lewat browser.
+<FilesMatch "\.(xls|xlsx|xlsm|csv|sql|bak|log|ini|old)$">
+	<IfModule mod_authz_core.c>
+		Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order allow,deny
+		Deny from all
+	</IfModule>
+</FilesMatch>
+
+# error_log jangan bisa dibaca publik
+<Files "error_log">
+	<IfModule mod_authz_core.c>
+		Require all denied
+	</IfModule>
+	<IfModule !mod_authz_core.c>
+		Order allow,deny
+		Deny from all
+	</IfModule>
+</Files>

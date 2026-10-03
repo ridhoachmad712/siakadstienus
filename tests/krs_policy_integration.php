@@ -1,0 +1,50 @@
+<?php
+// Dipanggil oleh security_integration.php pada database fixture terpisah.
+$prodi['id_user']=(int)siakad_baris($db,"SELECT id_user FROM user WHERE username='P1' AND level='Jurusan/Prodi'")['id_user'];
+check(siakad_semester_normal(2026,2026,'Ganjil')===1 && siakad_semester_normal(2025,2026,'Ganjil')===3 && siakad_semester_normal(2024,2026,'Genap')===6,'semester from selected academic period');
+check(siakad_semester_normal(2027,2026,'Ganjil')===null && siakad_semester_normal(2026,2026,'Pendek')===null,'invalid cohort and unknown parity fail closed');
+check(siakad_semester_matkul('1MN')===1 && siakad_semester_matkul('3AK')===3 && siakad_semester_matkul('8')===8 && siakad_semester_matkul('AK3')===null,'legacy semester labels parsed strictly');
+foreach (['M6'=>'3MN','M7'=>'1MN'] as $mk=>$semester) {
+    seed('mata_kuliah',['kode_matkul'=>$mk,'nama_matkul'=>$mk,'semester'=>$semester,'sks'=>3,'id_jenis_mk'=>1]);
+    seed('prodi_has_matkul',['kode_prodi'=>'P1','kode_matkul'=>$mk]);
+    seed('jadwal_mengajar',['id_jadwal'=>$mk==='M6'?700:701,'nip'=>'D1','kode_mk'=>$mk,'kode_prodi'=>'P1','id_thn_akademik'=>1,'kode_ruangan'=>1,'id_hari'=>2,'mulai_jam'=>$mk==='M6'?'16:00:00':'17:00:00','sampai_jam'=>$mk==='M6'?'17:00:00':'18:00:00']);
+}
+$policyStudent=['username'=>'S3','level'=>'mhs','kode_prodi'=>'P1'];
+$context=siakad_krs_konteks($db,'S3','P1',1);
+$offers=siakad_krs_penawaran($db,'S3','P1',1,$context);
+check(!in_array(700,array_column($offers['reguler'],'id_jadwal')) && !$offers['tambahan'],'upper semester hidden without permission');
+denied(fn()=>siakad_ambil_krs($db,$policyStudent,1,[1,700]),'forged upper semester rejected atomically');
+check(!siakad_baris($db,"SELECT id_krs FROM krs_mhs WHERE nim_npm='S3'"),'no partial KRS from mixed valid and invalid choices');
+$permit=['tindakan'=>'izin','kode_matkul'=>'M6','jenis'=>'semester_atas','alasan'=>'Persetujuan akademik pengujian'];
+denied(fn()=>siakad_krs_atur($db,$policyStudent,'S3',1,$permit),'student cannot grant own permission');
+$otherProdi=array_merge($prodi,['kode_prodi'=>'P2']);
+denied(fn()=>siakad_krs_atur($db,$otherProdi,'S3',1,$permit),'other prodi cannot grant permission');
+denied(fn()=>siakad_krs_atur($db,$prodi,'S3',1,array_merge($permit,['jenis'=>'mengulang'])),'permission kind must match semester relation');
+denied(fn()=>siakad_krs_atur($db,$prodi,'S3',2,$permit),'permission requires offering in same period');
+siakad_krs_atur($db,$prodi,'S3',1,$permit);
+$context=siakad_krs_konteks($db,'S3','P1',1);
+$offers=siakad_krs_penawaran($db,'S3','P1',1,$context);
+check(count($offers['tambahan'])===1 && $offers['tambahan'][0]['jenis_izin']==='Semester atas','approved upper course appears in additional group');
+check(!siakad_krs_konteks($db,'S3','P1',2)['permissions'],'permission does not leak to another period');
+siakad_ambil_krs($db,$policyStudent,1,[700]);
+check((bool)siakad_baris($db,"SELECT nim_npm FROM khs_mhs WHERE nim_npm='S3' AND id_jadwal=700"),'approved upper course creates KRS and KHS');
+siakad_krs_atur($db,$prodi,'S3',1,['tindakan'=>'cabut','kode_matkul'=>'M6','alasan'=>'Izin dicabut untuk pengujian']);
+check((bool)siakad_baris($db,"SELECT id_krs FROM krs_mhs WHERE nim_npm='S3' AND id_jadwal=700"),'revocation preserves existing KRS');
+$id=siakad_baris($db,"SELECT id_krs FROM krs_mhs WHERE nim_npm='S3' AND id_jadwal=700")['id_krs'];
+siakad_hapus_krs($db,$policyStudent,$id);
+denied(fn()=>siakad_ambil_krs($db,$policyStudent,1,[700]),'revoked permission rejected by backend');
+siakad_krs_atur($db,$prodi,'S3',1,['tindakan'=>'semester','semester'=>'3','alasan'=>'Penetapan semester mahasiswa transfer']);
+check(siakad_krs_konteks($db,'S3','P1',1)['semester']===3 && siakad_krs_konteks($db,'S3','P1',2)['semester']===1,'override isolated to selected period');
+denied(fn()=>siakad_ambil_krs($db,$policyStudent,1,[701]),'lower semester rejected without repeating permission');
+siakad_krs_atur($db,$prodi,'S3',1,['tindakan'=>'izin','kode_matkul'=>'M7','jenis'=>'mengulang','alasan'=>'Persetujuan mengulang mata kuliah']);
+siakad_ambil_krs($db,$policyStudent,1,[701]);
+$id=siakad_baris($db,"SELECT id_krs FROM krs_mhs WHERE nim_npm='S3' AND id_jadwal=701")['id_krs'];
+siakad_hapus_krs($db,$policyStudent,$id);
+check(siakad_krs_konteks($db,'S3','P1',1)['permissions']['M7']['jenis']==='mengulang','repeating permission accepted');
+siakad_ubah($db,"UPDATE mahasiswa SET status_mhs='Cuti' WHERE nim_npm='S3'");
+denied(fn()=>siakad_ambil_krs($db,$policyStudent,1,[700]),'inactive student denied even with semester override');
+check(!array_filter(siakad_krs_penawaran($db,'S3','P1',1,siakad_krs_konteks($db,'S3','P1',1))),'inactive student has no selectable offerings');
+siakad_ubah($db,"UPDATE mahasiswa SET status_mhs='Aktif' WHERE nim_npm='S3'");
+siakad_krs_atur($db,$prodi,'S3',1,['tindakan'=>'semester','semester'=>'','alasan'=>'Kembali ke perhitungan semester otomatis']);
+check(siakad_krs_konteks($db,'S3','P1',1)['semester']===1,'restore automatic semester');
+check((int)siakad_baris($db,"SELECT COUNT(*) n FROM krs_kebijakan_log WHERE nim_npm='S3'")['n']===5,'all policy changes have audit records');
