@@ -51,7 +51,7 @@ if ($sk_krs_context && $sk_krs_context['valid']) {
         </tbody></table></div>
         <?php } ?>
       </form>
-    <?php } else { ?>
+    <?php } elseif ($sk_schedule_only) { sk_schedule_cards($sk_rows,false,$id_thn_akademik,true); } else { ?>
       <div class="table-responsive"><table class="table sk-data-table sk-mobile-rows"><thead><tr><th>Mata kuliah</th><th><?= $sk_results?'Periode / semester':'Jadwal / dosen'; ?></th><th>SKS</th><?php if ($sk_results) { ?><th>Nilai akhir</th><th>Grade</th><th>Bobot</th><?php } elseif (!$sk_schedule_only) { ?><th>Aksi</th><?php } ?></tr></thead><tbody>
       <?php if (!$sk_rows) sk_empty_row($sk_results?6:($sk_schedule_only?3:4),$sk_transcript?'Belum ada hasil studi yang sudah dinilai.':'Belum ada mata kuliah pada periode ini.'); ?>
       <?php foreach ($sk_rows as $row) { ?><tr><td data-label="Mata kuliah"><strong><?= sk_escape($row['nama_matkul'] ?: $row['kode_mk']); ?></strong><small><?= sk_escape($row['kode_mk']); ?><?= $sk_krs_context?' · Semester '.sk_escape($row['semester']):''; ?></small><?php if (isset($review_context) && siakad_krs_jenis_pilihan($review_context,$row)===null) { ?><span class="sk-status">Perlu ditinjau</span><?php } ?></td><td data-label="<?= $sk_results?'Periode / semester':'Jadwal / dosen'; ?>"><?php if ($sk_results) { ?><?= sk_escape(trim($row['thn_akademik'].' '.$row['ket'])); ?><small>Semester <?= sk_escape($row['semester']); ?></small><?php } else { ?><?= sk_escape(($row['nama_hari'] ?: 'Hari belum diatur').' · '.substr($row['mulai_jam'],0,5).'–'.substr($row['sampai_jam'],0,5)); ?><small><?= sk_escape($row['nama_dosen']); ?> · <?= sk_escape($row['nama_ruangan']); ?></small><?php } ?></td><td data-label="SKS"><?= (int)$row['sks']; ?></td>

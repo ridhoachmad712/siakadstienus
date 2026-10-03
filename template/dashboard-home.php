@@ -45,12 +45,33 @@ if (in_array($level,['mhs','dosen'],true)) {
     $sk_schedule=siakad_semua($koneksi,"SELECT m.nama_matkul,h.nama_hari,r.nama_ruangan,j.mulai_jam,j.sampai_jam FROM jadwal_mengajar j $sk_join LEFT JOIN mata_kuliah m ON m.kode_matkul=j.kode_mk LEFT JOIN tbl_hari h ON h.id_hari=j.id_hari LEFT JOIN tbl_ruangan r ON r.kode_ruangan=j.kode_ruangan WHERE $sk_scope AND j.id_thn_akademik=? ORDER BY j.id_hari,j.mulai_jam LIMIT 5",'si',[$username,$sk_year_id]);
 }
 $sk_window=siakad_baris($koneksi,'SELECT dari_tgl,sampai_tgl FROM jadwal_penawaran WHERE id_thn_akademik=?','i',[$sk_year_id]);
-$sk_krs_status='KRS · '.sk_period_status($koneksi,'jadwal_penawaran',$sk_year_id)['label'];
+$sk_krs_state=sk_period_status($koneksi,'jadwal_penawaran',$sk_year_id);
+$sk_grade_state=sk_period_status($koneksi,'jadwal_input_nilai',$sk_year_id);
+$sk_krs_status='KRS · '.$sk_krs_state['label'];
+$sk_attention_title='Periode akademik';
+$sk_attention_note=$sk_context;
+$sk_attention_link=$sk_primary;
+if ($level==='Jurusan/Prodi') {
+    $sk_missing_limits=$sk_count('SELECT COUNT(*) n FROM prodi_has_mhs p LEFT JOIN pengaturan_sks_mhs s ON s.nim_npm=p.nim_npm AND s.id_thn_akademik=? WHERE p.kode_prodi=? AND s.nim_npm IS NULL','is',[$sk_year_id,$kode_prodi]);
+    $sk_attention_title=$sk_missing_limits.' mahasiswa belum memiliki batas SKS';
+    $sk_attention_note='Periksa batas SKS sebelum mahasiswa mengisi KRS pada periode ini.';
+    $sk_attention_link=['Atur batas SKS','sks_mhs?qwe='.$sk_year_id];
+} elseif ($level==='dosen') {
+    $sk_attention_title=$sk_metrics[2][1].' nilai mahasiswa belum diisi';
+    $sk_attention_note=$sk_grade_state['label'].' · '.$sk_grade_state['note'];
+} elseif ($level==='mhs') {
+    $sk_attention_title=$sk_limit?'Rencana studi: '.(int)$sk_sks['n'].' dari '.(int)$sk_limit['sks'].' SKS':'Batas SKS belum ditentukan';
+    $sk_attention_note=$sk_limit?$sk_krs_state['note']:'Hubungi program studi untuk pengaturan batas SKS periode ini.';
+} else {
+    $sk_attention_note='KRS: '.$sk_krs_state['label'].' · Input nilai: '.$sk_grade_state['label'];
+    $sk_attention_link=['Kelola periode','thn_akademik'];
+}
 ?>
 <section class="sk-dashboard-heading">
   <div><div class="sk-eyebrow">Beranda / <?= sk_escape(sk_role_label($level)); ?></div><h2><?= sk_escape($sk_title); ?></h2><p><?= sk_escape($sk_description); ?></p></div>
   <a class="btn btn-primary" href="<?= sk_escape($sk_primary[1]); ?>"><?= sk_escape($sk_primary[0]); ?> <span aria-hidden="true">↗</span></a>
 </section>
+<div class="card sk-dashboard-status"><div><strong><?= sk_escape($sk_attention_title); ?></strong><p><?= sk_escape($sk_attention_note); ?></p></div><a class="btn btn-outline-primary btn-sm" href="<?= sk_escape($sk_attention_link[1]); ?>"><?= sk_escape($sk_attention_link[0]); ?></a></div>
 <div class="sk-metrics">
 <?php foreach ($sk_metrics as [$label,$value,$note]) { ?>
   <dl class="card sk-metric mb-0"><dt><?= sk_escape($label); ?></dt><dd><?= sk_escape($value); ?></dd><small><?= sk_escape($note); ?></small></dl>

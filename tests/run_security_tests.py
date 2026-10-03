@@ -105,7 +105,7 @@ try:
     if args.ui:
         shutil.copytree(ROOT / 'dist', fixture / 'dist')
         (fixture / 'assets').mkdir()
-        for asset in ('siakad.css','academic.js','form-layout.js'):
+        for asset in ('siakad.css','academic.js','form-layout.js','ui-ux.js'):
             shutil.copy2(ROOT / 'assets' / asset, fixture / 'assets' / asset)
     # PHP's extensionless routes need a router in this temporary CLI server.
     router = fixture / 'router.php'
@@ -175,12 +175,17 @@ chdir(dirname($target)); require $target;
     check(request(admin, '/pages/mhs', {'aksi':'hapus','nim_npm':'S1','csrf_token':admin_token})[0] == 422, 'master student history protected')
     check(request(admin, '/pages/login3')[0] == 302, 'legacy login redirects to single login')
     if args.ui:
-        ui = subprocess.run(['node', str(ROOT / 'tests/ui_smoke.cjs'), base, str(temp_root / 'screenshots')], capture_output=True, text=True, creationflags=flags)
+        sql("UPDATE tbl_hari SET nama_hari='Senin' WHERE id_hari=1; UPDATE tbl_hari SET nama_hari='Selasa' WHERE id_hari=2; UPDATE jadwal_mengajar SET id_hari=2 WHERE id_jadwal=3;", 'siakad_security_test')
+        # More than one page of unrelated synthetic master courses exercises the real AJAX table.
+        for number in range(20):
+            sql(f"INSERT INTO mata_kuliah VALUES ('UX{number:02d}','Mata kuliah uji {number:02d}',3,'{2 if number % 2 else 4}MN',1);", 'siakad_security_test')
+        ui = subprocess.run(['node', str(ROOT / 'tests/ui_smoke.cjs'), base, str(ROOT / 'tests/artifacts/ui')], capture_output=True, text=True, creationflags=flags)
         if ui.returncode:
             raise RuntimeError(ui.stdout + ui.stderr)
         print(ui.stdout.strip())
     web_log.flush()
     logs = (temp_root / 'php.log').read_text(encoding='utf-8', errors='replace')
+    check('Undefined variable $sk_attention' not in logs, 'dashboard task summaries initialized')
     check('Fatal error' not in logs and 'Uncaught' not in logs, 'no fatal PHP errors in tested routes')
     check('Undefined variable $tampil_dosen' not in logs and 'Undefined variable $tampil_mhs' not in logs, 'legacy pages receive header profile data')
     print(f'PASS: {checks} HTTP and migration checks')

@@ -37,3 +37,27 @@ function sk_study_totals($rows) {
     // KHS lama membagi mutu dengan seluruh SKS periode; transkrip hanya memuat baris bernilai.
     return ['sks'=>$total,'graded'=>$graded,'ip'=>$total?number_format($mutu/$total,2,',','.'):'—'];
 }
+
+function sk_schedule_cards($rows,$edit=false,$period=0,$student=false) {
+    $days=[];
+    foreach ($rows as $row) $days[$row['nama_hari'] ?: 'Hari belum diatur'][]=$row;
+    echo '<div class="sk-days">';
+    if (!$days) echo '<div class="sk-empty-state">Belum ada jadwal pada periode ini.</div>';
+    foreach ($days as $day=>$classes) {
+        echo '<section class="sk-day"><h3 class="sk-day-heading">'.sk_escape($day).'<small>'.count($classes).' kelas</small></h3><div class="sk-day-grid">';
+        foreach ($classes as $row) {
+            echo '<article class="sk-class-card"><div class="sk-class-time">'.sk_escape(substr($row['mulai_jam'],0,5).'–'.substr($row['sampai_jam'],0,5)).'</div><div><h3>'.sk_escape($row['nama_matkul'] ?: $row['kode_mk']).'</h3><small>'.sk_escape($row['kode_mk']).' · '.(int)$row['sks'].' SKS · Semester '.sk_escape($row['semester']).'</small></div><div class="sk-class-details"><span>'.sk_escape($row['nama_dosen'] ?: 'Dosen belum diatur').'</span><span>Ruangan · '.sk_escape($row['nama_ruangan'] ?: 'Belum diatur').'</span>';
+            if (!$student) echo '<span>'.(int)$row['peserta'].' mahasiswa</span>';
+            echo '</div>';
+            if (!$student) {
+                echo '<div class="sk-actions"><a class="btn btn-secondary btn-sm" href="get_daftar_mahasiswa?qwe='.(int)$row['id_jadwal'].'">Lihat peserta</a>';
+                if ($edit) echo '<a class="btn btn-outline-danger btn-sm" href="buat_jadwal?qwe='.(int)$period.'&amp;id='.(int)$row['id_jadwal'].'&amp;aksi=hapus&amp;id_thn_akademik='.(int)$period.'">Hapus</a>';
+                echo '</div>';
+            }
+            echo '</article>';
+        }
+        echo '</div></section>';
+    }
+    echo '</div>';
+}
+?>

@@ -27,17 +27,27 @@ fs.mkdirSync(shots, { recursive: true });
       await page.locator('#level').selectOption(role);
       await Promise.all([page.waitForURL('**/pages/dashboard'),page.getByRole('button',{name:'Masuk',exact:true}).click()]);
       assert.equal(await page.locator('.sk-metric').count(), 3); checks++;
+      assert.ok((await page.locator('.sk-dashboard-status strong').textContent()).length>0); checks++;
       assert.equal(await page.locator('form').count(), 0); checks++;
       assert.equal(await page.locator('a[aria-current="page"]').textContent(),'Beranda'); checks++;
       assert.equal(await page.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--sk-primary').trim()),'#7b203a'); checks++;
-      assert.equal(await page.locator('.sk-navigation .nav-item.active').evaluate(el=>getComputedStyle(el,'::after').borderBottomColor),'rgb(123, 32, 58)'); checks++;
+      assert.equal(await page.locator('.sk-navigation a.active').evaluate(el=>getComputedStyle(el).color),'rgb(123, 32, 58)'); checks++;
       await page.screenshot({ path: path.join(shots,username+'-desktop.png'), fullPage:true });
       await page.setViewportSize({ width:360,height:800 });
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true); checks++;
       await page.getByRole('button',{name:'Buka menu navigasi'}).click();
       await page.locator('#navbar-menu.show').waitFor(); checks++;
       assert.equal(await page.locator('.sk-navigation').isVisible(),true); checks++;
+      await page.waitForFunction(()=>document.body.classList.contains('sk-sidebar-open'));
+      assert.equal(await page.locator('.sk-navigation a').first().evaluate(el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest('a')===el;}),true); checks++;
+      await page.mouse.click(350,400);
+      await page.waitForFunction(()=>!document.body.classList.contains('sk-sidebar-open')); checks++;
+      await page.getByRole('button',{name:'Buka menu navigasi'}).click();
+      await page.waitForFunction(()=>document.body.classList.contains('sk-sidebar-open'));
       await page.screenshot({ path:path.join(shots,username+'-mobile.png'),fullPage:true });
+      await page.keyboard.press('Escape');
+      await page.locator('#navbar-menu.show').waitFor({state:'hidden'}); checks++;
+      await page.waitForFunction(()=>document.activeElement===document.querySelector('.sk-menu-toggle')); checks++;
       await page.setViewportSize({width:1366,height:900});
       if (role==='mhs'||role==='dosen') {
         await page.locator('.sk-account').click();
@@ -51,8 +61,8 @@ fs.mkdirSync(shots, { recursive: true });
         await page.screenshot({path:path.join(shots,username+'-profile-mobile.png'),fullPage:true});
         await page.setViewportSize({width:1366,height:900});
       } else {
-        await page.locator('.sk-navigation button').first().click();
-        assert.equal(await page.locator('.sk-navigation .dropdown-menu.show').count(),1); checks++;
+        await page.locator('.sk-navigation summary').first().click();
+        assert.equal(await page.locator('.sk-navigation details[open]').count(),1); checks++;
       }
       await page.goto(base+'/pages/'+route);
       assert.equal(await page.locator('.sk-header').count(),1); checks++;
@@ -70,6 +80,11 @@ fs.mkdirSync(shots, { recursive: true });
         await page.setViewportSize({width:1366,height:900});
         const response=await page.goto(base+'/pages/'+url);
         assert.equal(response.status(),200); checks++;
+        if (url.startsWith('rekap_jadwal')||url.startsWith('jadwal_mengajar')||url.startsWith('jadwal_kuliah')) {
+          assert.ok(await page.locator('.sk-class-card').count()>0); checks++;
+          assert.ok(await page.locator('.sk-day-heading').count()>0); checks++;
+          assert.match(await page.locator('.sk-day-heading').first().textContent(),/Senin|Selasa/); checks++;
+        }
         assert.equal(await page.locator('.sk-academic').count(),1); checks++;
         if(role==='mhs'&&url==='khs?qwe=1') {
           assert.equal(await page.locator('.sk-inline-summary strong').last().textContent(),'2,00'); checks++;
@@ -81,7 +96,25 @@ fs.mkdirSync(shots, { recursive: true });
       }
       await page.setViewportSize({width:1366,height:900});
       if(role==='admin') {
+        await page.goto(base+'/pages/mata_kuliah');
+        await page.locator('.sk-table-pager').waitFor();
+        assert.equal(await page.locator('table[data-sk-table] > tbody > tr:not([hidden])').count(),15); checks++;
+        await page.getByRole('button',{name:'Berikutnya',exact:true}).click();
+        assert.match(await page.locator('.sk-table-pager').textContent(),/Halaman 2\/2/); checks++;
+        await page.getByRole('combobox',{name:'Semua semester',exact:true}).selectOption('2MN');
+        assert.equal(await page.locator('table[data-sk-table] > tbody > tr:not([hidden])').count(),10); checks++;
+        await page.locator('#search_text').fill('UX00'); await page.locator('#search_text').press('End');
+        await page.waitForFunction(()=>document.querySelector('.sk-table-pager')?.textContent.includes('dari 1 data'));
+        assert.equal(await page.locator('.sk-table-pager').count(),1); checks++;
+        await page.screenshot({path:path.join(shots,'admin-table.png'),fullPage:true});
         await page.goto(base+'/pages/mhs');
+        await page.locator('.sk-table-columns').waitFor();
+        await page.locator('.sk-table-columns summary').click();
+        const email=page.locator('.sk-table-columns label').filter({hasText:'Email'}).locator('input');
+        assert.equal(await email.isChecked(),false); checks++;
+        await email.check();
+        assert.equal(await page.locator('table[data-sk-table] > thead th').filter({hasText:'Email'}).evaluate(el=>el.classList.contains('sk-column-hidden')),false); checks++;
+        await page.locator('.sk-table-columns summary').click();
         await page.locator('[data-bs-toggle="offcanvas"]').first().click();
         await page.locator('.offcanvas.show').waitFor();
         await page.waitForFunction(()=>Math.abs(document.querySelector('.offcanvas.show').getBoundingClientRect().x)<1);
@@ -112,6 +145,9 @@ fs.mkdirSync(shots, { recursive: true });
         await page.goto(base+'/pages/buat_jadwal?qwe=1');
         await page.getByRole('button',{name:'Tambah jadwal',exact:true}).click();
         await page.locator('#schedule-editor.show').waitFor();
+        await page.getByRole('button',{name:'Simpan jadwal',exact:true}).click();
+        assert.equal(await page.locator('#schedule-course').getAttribute('aria-invalid'),'true'); checks++;
+        assert.ok(await page.locator('.sk-field-error:visible').count()>0); checks++;
         await page.locator('#schedule-start').fill('10:00');
         await page.locator('#schedule-end').fill('09:00');
         assert.equal(await page.locator('#schedule-end').evaluate(el=>el.validity.valid),false); checks++;
