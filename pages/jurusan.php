@@ -208,33 +208,6 @@ if (isset($_POST['update'])) {
 <!-- Tabler Core -->
   <?php include "../template/scripts.php"; ?>
 <!-- javascript search data fakultas -->
-<script>
-  $(document).ready(function(){
-    load_data();
-    function load_data(query)
-    {
-      $.ajax({
-        url:"search_jurusan.php",
-        method:"post",
-        data:{query:query},
-        success:function(data)
-        {
-          $('#data-jurusan').html(data);
-        }
-      });
-    }
-    $('#search_text').keyup(function(){
-      var search = $(this).val();
-      if(search != '')
-      {
-        load_data(search);
-      }
-      else
-      {
-        load_data();      
-      }
-    });
-  });
-</script>
+
 </body>
 </html>

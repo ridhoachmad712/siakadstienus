@@ -179,6 +179,15 @@ chdir(dirname($target)); require $target;
         # More than one page of unrelated synthetic master courses exercises the real AJAX table.
         for number in range(20):
             sql(f"INSERT INTO mata_kuliah VALUES ('UX{number:02d}','Mata kuliah uji {number:02d}',3,'{2 if number % 2 else 4}MN',1);", 'siakad_security_test')
+        status, listing, _ = request(admin, '/pages/search_matkul.php', {'query':'UX','page':'2','size':'15'})
+        check(status == 200 and 'data-total="20"' in listing and 'data-page="2"' in listing and listing.count('id="offcanvasEndUX') == 5, 'server returns only requested course page')
+        status, listing, _ = request(admin, '/pages/search_matkul.php', {'query':'UX00','filters[Semester]':'2MN'})
+        check(status == 200 and 'data-total="0"' in listing, 'server combines search OR clauses with semester filter')
+        status, listing, _ = request(admin, '/pages/search_matkul.php', {'query':'UX','page':'999','size':'999'})
+        check(status == 200 and 'data-size="15"' in listing and 'data-page="2"' in listing, 'server bounds page size and page number')
+        check(request(student, '/pages/search_matkul.php', {'page':'1'})[0] == 403, 'server pagination retains role guard')
+        status, listing, _ = request(prodi, '/pages/jurusan_has_mhs?list_search=S2')
+        check(status == 200 and '"total":1' in listing, 'prodi server list search applies within role scope')
         ui = subprocess.run(['node', str(ROOT / 'tests/ui_smoke.cjs'), base, str(ROOT / 'tests/artifacts/ui')], capture_output=True, text=True, creationflags=flags)
         if ui.returncode:
             raise RuntimeError(ui.stdout + ui.stderr)

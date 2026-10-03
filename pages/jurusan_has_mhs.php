@@ -99,12 +99,15 @@ function tgl_indo($tanggal){
                     </thead>
                         <?php
                         $no=1; 
-                        $mhs=mysqli_query($koneksi,"SELECT * FROM prodi_has_mhs
+                        require_once '../config/table_pagination.php';
+[$sk_list_sql,$sk_offset]=siakad_tabel_statis($koneksi,"SELECT * FROM prodi_has_mhs
                           INNER JOIN mahasiswa ON prodi_has_mhs.nim_npm=mahasiswa.nim_npm
                           LEFT JOIN tbl_jk ON mahasiswa.id_jk=tbl_jk.id_jk
                           LEFT JOIN tbl_agama ON mahasiswa.id_agama=tbl_agama.id_agama
                           WHERE prodi_has_mhs.kode_prodi='$kode_prodi'
-                          ORDER BY mahasiswa.nim_npm DESC"); // Menambahkan ORDER BY untuk mengurutkan berdasarkan NIM
+                          ORDER BY mahasiswa.nim_npm DESC",["mahasiswa.nim_npm", "mahasiswa.nama_mhs"]);
+$no=$sk_offset+1;
+$mhs=mysqli_query($koneksi,$sk_list_sql); // Menambahkan ORDER BY untuk mengurutkan berdasarkan NIM
                         while ($t_mhs=mysqli_fetch_array($mhs)) {
                           $foto_mhs=$t_mhs['foto_mhs'];
                           ?>
@@ -145,7 +148,7 @@ function tgl_indo($tanggal){
           </div>
         </div>
       </div>
-      <?php 
+      <?php
       require_once"../template/footer.php";
       ?>
     </div>

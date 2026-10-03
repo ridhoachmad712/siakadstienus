@@ -85,7 +85,10 @@ if (isset($_POST['simpan'])) {
                     </thead>
                     <?php 
                     $no=1;
-                    $mhs=mysqli_query($koneksi,"SELECT * FROM mhs_has_pa INNER JOIN mahasiswa ON mhs_has_pa.nim_npm=mahasiswa.nim_npm WHERE nip='$username'");
+                    require_once '../config/table_pagination.php';
+[$sk_list_sql,$sk_offset]=siakad_tabel_statis($koneksi,"SELECT * FROM mhs_has_pa INNER JOIN mahasiswa ON mhs_has_pa.nim_npm=mahasiswa.nim_npm WHERE nip='$username'",["mahasiswa.nim_npm", "mahasiswa.nama_mhs"]);
+$no=$sk_offset+1;
+$mhs=mysqli_query($koneksi,$sk_list_sql);
                     while ($t_mhs=mysqli_fetch_array($mhs)) {
                       ?>
                       <tr>

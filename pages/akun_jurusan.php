@@ -80,8 +80,11 @@ $r_pengaturan=mysqli_fetch_array($pengaturan);
                   <tbody>
                     <?php 
                     $no=1;
-                    $user=mysqli_query($koneksi,"SELECT * FROM user
-                      INNER JOIN prodi ON user.kode_prodi=prodi.kode_prodi WHERE level='Jurusan/Prodi'");
+                    require_once '../config/table_pagination.php';
+[$sk_list_sql,$sk_offset]=siakad_tabel_statis($koneksi,"SELECT * FROM user
+                      INNER JOIN prodi ON user.kode_prodi=prodi.kode_prodi WHERE level='Jurusan/Prodi'",["username"]);
+$no=$sk_offset+1;
+$user=mysqli_query($koneksi,$sk_list_sql);
                     while ($t_user=mysqli_fetch_array($user)) {
                       ?>
                       <tr>
@@ -149,7 +152,7 @@ $r_pengaturan=mysqli_fetch_array($pengaturan);
               ?>
             <?php }else{ ?>
               <option value="<?= $t_prodi['kode_prodi']; ?>"><?= $t_prodi['nama_prodi']; ?></option>
-              <?php 
+              <?php
             }
           }
           ?>

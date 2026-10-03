@@ -2,6 +2,7 @@
 include"../config/koneksi.php";
 require_once "../config/auth.php";
 siakad_wajib_login_ajax($koneksi);
+require_once '../config/table_pagination.php';
 if(isset($_POST["query"]))
 {
 	$search = mysqli_real_escape_string($koneksi, $_POST["query"]);
@@ -32,7 +33,8 @@ function tgl_indo($tanggal){
 }
 ?>
 <?php
-	$result = mysqli_query($koneksi, $data_mahasiswa);
+	[$data_mahasiswa,$sk_offset]=siakad_tabel_halaman($koneksi,$data_mahasiswa,['Status mhs'=>'mahasiswa.status_mhs','Tahun masuk'=>'mahasiswa.thn_masuk']);
+$result = mysqli_query($koneksi, $data_mahasiswa);
 	if(mysqli_num_rows($result) > 0)
 	{
 		?>
@@ -54,7 +56,7 @@ function tgl_indo($tanggal){
 				</tr>
 			</thead>
 			<?php
-			$no=1;
+			$no=$sk_offset+1;
 			while($t_mhs = mysqli_fetch_array($result))
 			{
 				$nim_npm=$t_mhs['nim_npm'];
@@ -252,4 +254,5 @@ function tgl_indo($tanggal){
 								</tr>
 							<?php } ?>
 						</table>
-					
+
+</div>

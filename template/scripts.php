@@ -10,7 +10,8 @@ $sk_base = isset($sk_base) ? $sk_base : '../';
 <script src="<?= $sk_base; ?>dist/js/jquery.js"></script>
 <script src="<?= $sk_base; ?>dist/js/tabler.min.js"></script>
 <script src="<?= $sk_base; ?>assets/form-layout.js?v=20261003-layout"></script>
-<script src="<?= $sk_base; ?>assets/ui-ux.js?v=20261004-topnav"></script>
+<?php if(isset($sk_static_pager)){ ?><script type="application/json" id="sk-static-pagination"><?= json_encode($sk_static_pager,JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT); ?></script><?php } ?>
+<script src="<?= $sk_base; ?>assets/ui-ux.js?v=20261004-mobile"></script>
 <script>
 	// Tautan penghapusan lama dikirim sebagai POST dengan token sesi.
 	// Delegasi juga bekerja untuk baris yang dimuat melalui AJAX.

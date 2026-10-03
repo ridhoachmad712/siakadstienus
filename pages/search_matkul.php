@@ -2,6 +2,7 @@
 include"../config/koneksi.php";
 require_once "../config/auth.php";
 siakad_wajib_login_ajax($koneksi);
+require_once '../config/table_pagination.php';
 if(isset($_POST["query"]))
 {
 	$search = mysqli_real_escape_string($koneksi, $_POST["query"]);
@@ -12,7 +13,8 @@ if(isset($_POST["query"]))
 }
 ?>
 <?php
-	$result = mysqli_query($koneksi, $mata_kuliah);
+	[$mata_kuliah,$sk_offset]=siakad_tabel_halaman($koneksi,$mata_kuliah,['Semester'=>'mata_kuliah.semester']);
+$result = mysqli_query($koneksi, $mata_kuliah);
 	if(mysqli_num_rows($result) > 0)
 	{
 		?>
@@ -30,7 +32,7 @@ if(isset($_POST["query"]))
 			</thead>
 			<tbody>
 				<?php
-				$no=1;
+				$no=$sk_offset+1;
 				while($t_matkul = mysqli_fetch_array($result))
 				{
 					$kode_matkul=$t_matkul['kode_matkul'];
@@ -152,3 +154,5 @@ if(isset($_POST["query"]))
 			<?php } ?>
 		</tbody>
 	</table>
+
+</div>

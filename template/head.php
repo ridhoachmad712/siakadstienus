@@ -48,7 +48,7 @@ $sk_body_class = isset($sk_body_class) ? $sk_body_class : '';
 	<link href="<?= $sk_base; ?>dist/css/demo.min.css" rel="stylesheet" />
 
 	<!-- Tema SIAKAD (harus paling akhir) -->
-	<link href="<?= $sk_base; ?>assets/siakad.css?v=20261004-topnav" rel="stylesheet" />
+	<link href="<?= $sk_base; ?>assets/siakad.css?v=20261004-mobile" rel="stylesheet" />
 </head>
 
 <body class="antialiased <?= $sk_body_class; ?> <?= strpos($sk_body_class,'page-login')===false?'sk-app-shell':''; ?>">

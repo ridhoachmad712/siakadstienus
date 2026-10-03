@@ -9,7 +9,17 @@ $sk_cohorts=siakad_semua($koneksi,'SELECT DISTINCT m.thn_masuk FROM mahasiswa m 
 $args=[$id_thn_akademik,$kode_prodi]; $types='is'; $where='';
 if ($sk_cohort!=='') { $where.=' AND m.thn_masuk=?'; $args[]=$sk_cohort; $types.='s'; }
 if ($sk_search!=='') { $where.=' AND (m.nama_mhs LIKE ? OR m.nim_npm LIKE ?)'; $args[]='%'.$sk_search.'%'; $args[]='%'.$sk_search.'%'; $types.='ss'; }
-$sk_students=siakad_semua($koneksi,'SELECT m.nim_npm,m.nama_mhs,m.thn_masuk,m.status_mhs,l.sks FROM mahasiswa m JOIN prodi_has_mhs p ON p.nim_npm=m.nim_npm LEFT JOIN pengaturan_sks_mhs l ON l.nim_npm=m.nim_npm AND l.id_thn_akademik=? WHERE p.kode_prodi=?'.$where.' ORDER BY m.nim_npm',$types,$args);
+$sk_student_sql='SELECT m.nim_npm,m.nama_mhs,m.thn_masuk,m.status_mhs,l.sks FROM mahasiswa m JOIN prodi_has_mhs p ON p.nim_npm=m.nim_npm LEFT JOIN pengaturan_sks_mhs l ON l.nim_npm=m.nim_npm AND l.id_thn_akademik=? WHERE p.kode_prodi=?'.$where.' ORDER BY m.nim_npm';
+if(!$sk_limits){
+    $sk_count_sql=preg_replace('/^SELECT\s+.*?\s+FROM\s+/is','SELECT COUNT(*) AS total FROM ',$sk_student_sql);
+    $sk_count_sql=preg_replace('/\s+ORDER BY\s+.+$/is','',$sk_count_sql);
+    $sk_list_total=(int)(siakad_baris($koneksi,$sk_count_sql,$types,$args)['total']??0);
+    $sk_list_size=(int)($_GET['size']??15);if(!in_array($sk_list_size,[15,25,50],true))$sk_list_size=15;
+    $sk_list_page=min(max(1,(int)($_GET['page']??1)),max(1,(int)ceil($sk_list_total/$sk_list_size)));
+    $sk_student_sql.=' LIMIT '.$sk_list_size.' OFFSET '.(($sk_list_page-1)*$sk_list_size);
+    $GLOBALS['sk_static_pager']=['page'=>$sk_list_page,'size'=>$sk_list_size,'total'=>$sk_list_total,'search'=>'','hideSearch'=>true];
+}
+$sk_students=siakad_semua($koneksi,$sk_student_sql,$types,$args);
 ?>
 <form method="get" class="sk-filter-bar" aria-label="Filter mahasiswa">
   <?php if (!$sk_transcript) { ?><div><label class="form-label" for="academic-period">Tahun akademik</label><select class="form-select" name="qwe" id="academic-period"><?php foreach ($sk_periods as $row) { ?><option value="<?= (int)$row['id_thn_akademik']; ?>" <?= (int)$row['id_thn_akademik']===$id_thn_akademik?'selected':''; ?>><?= sk_escape(sk_period_label($row)); ?></option><?php } ?></select></div><?php } ?>

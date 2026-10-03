@@ -2,6 +2,7 @@
 include "../config/koneksi.php";
 require_once "../config/auth.php";
 siakad_wajib_login_ajax($koneksi);
+require_once '../config/table_pagination.php';
 if (isset($_POST["query"])) {
 	$search = mysqli_real_escape_string($koneksi, $_POST["query"]);
 	$data_dosen = "SELECT * FROM dosen LEFT JOIN tbl_jk ON dosen.id_jk=tbl_jk.id_jk
@@ -32,7 +33,8 @@ function tgl_indo($tanggal)
 }
 ?>
 <?php
-	$result = mysqli_query($koneksi, $data_dosen);
+	[$data_dosen,$sk_offset]=siakad_tabel_halaman($koneksi,$data_dosen,[]);
+$result = mysqli_query($koneksi, $data_dosen);
 	if (mysqli_num_rows($result) > 0) {
 	?>
 		<table class="table table-vcenter card-table">
@@ -52,7 +54,7 @@ function tgl_indo($tanggal)
 			</thead>
 			<tbody>
 				<?php
-				$no = 1;
+				$no=$sk_offset+1;
 				while ($t_dosen = mysqli_fetch_array($result)) {
 					$nip = $t_dosen['nip'];
 					$foto_dosen = $t_dosen['foto_dosen'];
@@ -228,3 +230,5 @@ function tgl_indo($tanggal)
 			<?php } ?>
 			</tbody>
 		</table>
+
+</div>

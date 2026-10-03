@@ -79,8 +79,11 @@ $r_pengaturan = mysqli_fetch_array($pengaturan);
                     </thead>
                     <?php
                     $no = 1;
-                    $user = mysqli_query($koneksi, "SELECT * FROM user
-                    INNER JOIN dosen ON user.username=dosen.nip WHERE level='dosen'");
+                    require_once '../config/table_pagination.php';
+[$sk_list_sql,$sk_offset]=siakad_tabel_statis($koneksi,"SELECT * FROM user
+                    INNER JOIN dosen ON user.username=dosen.nip WHERE level='dosen'",["user.username", "dosen.nama_dosen"]);
+$no=$sk_offset+1;
+$user=mysqli_query($koneksi,$sk_list_sql);
                     while ($t_user = mysqli_fetch_array($user)) {
                     ?>
                       <tr>

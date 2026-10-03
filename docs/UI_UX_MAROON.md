@@ -45,16 +45,27 @@ Pemeriksaan browser memakai Microsoft Edge headless: empat jenis akun, beranda, 
 
 Status periode mengikuti layanan akademik yang sudah ada: tanggal mulai `0000-00-00` berarti terbuka tanpa batas tanggal. Tampilan status diselaraskan dengan aturan itu, tanpa mengubah aturan penyimpanan.
 
-Pagination pada tabel master berjalan di browser setelah seluruh hasil dimuat; belum membatasi jumlah baris yang dikirim server. Tidak ada perubahan kebijakan nilai/perulangan mata kuliah. Semua pengujian browser dan PDF cetak menggunakan data sintetis pada salinan aplikasi.
+Pagination server diterapkan pada master mahasiswa/dosen/mata kuliah/prodi/institusi, akun, relasi prodi, perwalian, dan daftar mahasiswa akademik baca-saja. Daftar referensi kecil memakai pagination browser. Tidak ada perubahan kebijakan nilai/perulangan mata kuliah. Semua pengujian browser dan PDF cetak menggunakan data sintetis pada salinan aplikasi.
 
 ## Penyempurnaan UI menyeluruh
 
 - Menu bar putih di atas pada desktop, dropdown berkelompok, ikon, dan penanda maroon untuk halaman aktif. Ponsel/tablet memakai menu yang dibuka di bawah header, dengan Escape dan pengembalian fokus.
 - Dashboard admin menampilkan status periode KRS/nilai; prodi menampilkan jumlah mahasiswa yang belum diberi batas SKS; dosen menampilkan nilai yang belum diisi; mahasiswa mendapat ringkasan pengambilan SKS. Semua angka berasal dari data dalam lingkup akun.
-- Tabel master dan daftar mahasiswa baca-saja memiliki pencarian (memakai AJAX lama jika tersedia), filter status/angkatan/semester sesuai kolom, pagination 15/25/50 baris, dan pilihan kolom pada tabel lebar. Form nilai, batas SKS, dan pemilihan KRS tetap menampilkan semua kontrol agar penyimpanan lengkap. Filter browser berlaku pada hasil pencarian yang sudah dimuat.
+- Tabel master dan daftar mahasiswa baca-saja memiliki pencarian (memakai AJAX lama jika tersedia), filter status/angkatan/semester sesuai kolom, pagination 15/25/50 baris, dan pilihan kolom pada tabel lebar. Form nilai, batas SKS, dan pemilihan KRS tetap menampilkan semua kontrol agar penyimpanan lengkap. Filter daftar utama diproses server sebelum LIMIT, dengan scope akun tetap berlaku.
 - Jadwal prodi/dosen/mahasiswa memakai kartu per hari berisi waktu, mata kuliah, SKS, dosen, ruangan, serta peserta/aksi sesuai hak akun. Daftar kelas input nilai tetap memakai tabel dengan progres.
 - Form mendapat label yang terhubung dengan kontrol, penanda wajib, pesan kesalahan dekat kolom, tombol simpan maroon, dan nama aksi untuk tombol ikon. Validasi serta nama field backend tetap dipertahankan.
 - Status menggunakan warna hijau untuk aktif/terbuka, kuning untuk hal yang perlu perhatian, dan abu-abu untuk terkunci/belum dibuka. Notifikasi memakai peran aksesibilitas status/alert.
 - Login tetap sederhana dengan latar putih. Tampilan cetak tidak memuat sidebar atau kontrol tabel.
 
 Pengujian browser mencakup seluruh peran, desktop dan ponsel, menu atas/Escape/fokus, tabel AJAX/pagination/filter/pilihan kolom, pesan validasi, kartu jadwal, profil, pengisian KRS, izin semester, input nilai, serta cetak A4. Data pengujian sintetis dan database sementara terpisah dari database lokal maupun produksi.
+
+## Penyempurnaan mobile 4 Oktober 2026
+
+- Menu atas tetap dipertahankan. Panel mobile memiliki tinggi maksimum 65svh dan scroll internal, serta ditutup setelah memilih halaman.
+- Input teks/angka/select 16px dan kontrol utama minimal 44px pada ponsel. KRS memakai label pilihan besar.
+- Tabel master/akun/relasi prodi/perwalian menjadi kartu berlabel pada ponsel; informasi dan aksi tidak lagi berada di sisi kanan tabel. Pilihan kolom tersedia di desktop.
+- Dashboard memakai tiga statistik ringkas. Detail identitas dan kelompok form dapat dibuka, dan otomatis dibuka ketika validasi menemukan kesalahan.
+- Bar SKS/Simpan KRS serta tindakan nilai/batas SKS/profil tetap terlihat pada ponsel. Konten diberi ruang bawah; posisi mengikuti visualViewport saat keyboard mengubah viewport, dengan safe-area CSS. Form offcanvas memiliki footer simpan sendiri di luar bagian yang digulir.
+- Tabel AJAX dibatasi server 15/25/50 baris, debounce 250ms, pembatalan permintaan lama, pesan loading dan retry. Dialog baris hanya dirender untuk halaman data yang dimuat.
+- Form nilai/batas SKS/pilihan KRS tidak dipotong menjadi halaman, sehingga seluruh isian yang diperlukan tetap dikirim. Tidak ada perubahan rumus atau kebijakan akademik.
+- Pengujian perangkat fisik Safari/iPhone dan keyboard native masih perlu dilakukan; emulasi viewport tidak menggantikannya.

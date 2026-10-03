@@ -79,7 +79,10 @@ $r_pengaturan=mysqli_fetch_array($pengaturan);
                   <tbody>
                     <?php 
                     $no=1;
-                    $user=mysqli_query($koneksi,"SELECT * FROM user WHERE level='admin'");
+                    require_once '../config/table_pagination.php';
+[$sk_list_sql,$sk_offset]=siakad_tabel_statis($koneksi,"SELECT * FROM user WHERE level='admin'",["username"]);
+$no=$sk_offset+1;
+$user=mysqli_query($koneksi,$sk_list_sql);
                     while ($t_user=mysqli_fetch_array($user)) {
                       ?>
                       <tr>
@@ -126,7 +129,7 @@ $r_pengaturan=mysqli_fetch_array($pengaturan);
         <input type="text" name="username" placeholder="Username" class="form-control" required="require">
       </div>
       <div class="mb-3">
-        <label>Password</label> 
+        <label>Password</label>
         <input type="password" minlength="8" maxlength="72" name="password" placeholder="Password" class="form-control" required="require">
       </div>
     </div>

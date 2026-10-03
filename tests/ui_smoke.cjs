@@ -90,14 +90,23 @@ fs.mkdirSync(shots, { recursive: true });
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,url+' mobile width'); checks++;
         await page.screenshot({path:path.join(shots,username+'-'+url.split('?')[0]+'-mobile.png'),fullPage:true});
       }
+      if(role==='mhs'){
+        await page.goto(base+'/pages/ambil_jadwal?qwe=1');await page.setViewportSize({width:390,height:844});
+        await page.locator('#sk-krs-dock').waitFor();await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));
+        const dock=await page.locator('#sk-krs-dock').boundingBox();assert.ok(dock.y>=0&&dock.y+dock.height<=845);checks++;
+        assert.ok((await page.locator('.sk-course-choice').first().boundingBox()).height>=44);checks++;
+      }
       await page.setViewportSize({width:1366,height:900});
       if(role==='admin') {
         await page.goto(base+'/pages/mata_kuliah');
-        await page.locator('.sk-table-pager').waitFor();
+        await page.waitForFunction(()=>document.querySelectorAll('table[data-sk-table] > tbody > tr:not([hidden])').length===15);
         assert.equal(await page.locator('table[data-sk-table] > tbody > tr:not([hidden])').count(),15); checks++;
+        assert.equal(await page.locator('.sk-server-results').getAttribute('data-total'),'27');checks++;
         await page.getByRole('button',{name:'Berikutnya',exact:true}).click();
+        await page.waitForFunction(()=>document.querySelector('.sk-table-pager')?.textContent.includes('Halaman 2/2'));
         assert.match(await page.locator('.sk-table-pager').textContent(),/Halaman 2\/2/); checks++;
         await page.getByRole('combobox',{name:'Semua semester',exact:true}).selectOption('2MN');
+        await page.waitForFunction(()=>document.querySelectorAll('table[data-sk-table] > tbody > tr:not([hidden])').length===10);
         assert.equal(await page.locator('table[data-sk-table] > tbody > tr:not([hidden])').count(),10); checks++;
         await page.locator('#search_text').fill('UX00'); await page.locator('#search_text').press('End');
         await page.waitForFunction(()=>document.querySelector('.sk-table-pager')?.textContent.includes('dari 1 data'));

@@ -95,11 +95,14 @@ function tgl_indo($tanggal){
                   </thead>
                   <?php 
                   $no=1;
-                  $matkul=mysqli_query($koneksi,"SELECT * FROM prodi_has_matkul
+                  require_once '../config/table_pagination.php';
+[$sk_list_sql,$sk_offset]=siakad_tabel_statis($koneksi,"SELECT * FROM prodi_has_matkul
                     INNER JOIN mata_kuliah ON prodi_has_matkul.kode_matkul=mata_kuliah.kode_matkul
                     LEFT JOIN tbl_jenis_mk ON mata_kuliah.id_jenis_mk=tbl_jenis_mk.id_jenis_mk
                     WHERE kode_prodi='$kode_prodi'
-                    ORDER BY mata_kuliah.semester ASC");
+                    ORDER BY mata_kuliah.semester ASC",["mata_kuliah.kode_matkul", "mata_kuliah.nama_matkul"]);
+$no=$sk_offset+1;
+$matkul=mysqli_query($koneksi,$sk_list_sql);
                   while ($t_matkul=mysqli_fetch_array($matkul)) {
                     ?>
                     <tr>
@@ -126,7 +129,7 @@ function tgl_indo($tanggal){
         </div>
       </div>
     </div>
-    <?php 
+    <?php
     require_once"../template/footer.php";
     ?>
   </div>
