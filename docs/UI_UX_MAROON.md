@@ -49,7 +49,7 @@ Pagination pada tabel master berjalan di browser setelah seluruh hasil dimuat; b
 
 ## Penyempurnaan UI menyeluruh
 
-- Sidebar putih tetap pada layar desktop, menu berkelompok, ikon, dan penanda maroon untuk halaman aktif. Ponsel/tablet memakai drawer dengan backdrop, Escape, pengembalian fokus, dan pembatasan fokus keyboard.
+- Menu bar putih di atas pada desktop, dropdown berkelompok, ikon, dan penanda maroon untuk halaman aktif. Ponsel/tablet memakai menu yang dibuka di bawah header, dengan Escape dan pengembalian fokus.
 - Dashboard admin menampilkan status periode KRS/nilai; prodi menampilkan jumlah mahasiswa yang belum diberi batas SKS; dosen menampilkan nilai yang belum diisi; mahasiswa mendapat ringkasan pengambilan SKS. Semua angka berasal dari data dalam lingkup akun.
 - Tabel master dan daftar mahasiswa baca-saja memiliki pencarian (memakai AJAX lama jika tersedia), filter status/angkatan/semester sesuai kolom, pagination 15/25/50 baris, dan pilihan kolom pada tabel lebar. Form nilai, batas SKS, dan pemilihan KRS tetap menampilkan semua kontrol agar penyimpanan lengkap. Filter browser berlaku pada hasil pencarian yang sudah dimuat.
 - Jadwal prodi/dosen/mahasiswa memakai kartu per hari berisi waktu, mata kuliah, SKS, dosen, ruangan, serta peserta/aksi sesuai hak akun. Daftar kelas input nilai tetap memakai tabel dengan progres.
@@ -57,4 +57,4 @@ Pagination pada tabel master berjalan di browser setelah seluruh hasil dimuat; b
 - Status menggunakan warna hijau untuk aktif/terbuka, kuning untuk hal yang perlu perhatian, dan abu-abu untuk terkunci/belum dibuka. Notifikasi memakai peran aksesibilitas status/alert.
 - Login tetap sederhana dengan latar putih. Tampilan cetak tidak memuat sidebar atau kontrol tabel.
 
-Pengujian browser mencakup seluruh peran, desktop dan ponsel, drawer/Escape/fokus, tabel AJAX/pagination/filter/pilihan kolom, pesan validasi, kartu jadwal, profil, pengisian KRS, izin semester, input nilai, serta cetak A4. Data pengujian sintetis dan database sementara terpisah dari database lokal maupun produksi.
+Pengujian browser mencakup seluruh peran, desktop dan ponsel, menu atas/Escape/fokus, tabel AJAX/pagination/filter/pilihan kolom, pesan validasi, kartu jadwal, profil, pengisian KRS, izin semester, input nilai, serta cetak A4. Data pengujian sintetis dan database sementara terpisah dari database lokal maupun produksi.

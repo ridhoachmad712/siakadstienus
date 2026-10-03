@@ -4,27 +4,15 @@
   const toggle = document.querySelector('.sk-menu-toggle');
   const mobile = () => window.innerWidth < 1024;
   const closeMenu = () => { if (menu && menu.classList.contains('show') && toggle) toggle.click(); };
-  const backdrop=document.querySelector('.sk-sidebar-backdrop');
-  if (backdrop) document.body.append(backdrop);
   if (menu && toggle) {
-    menu.addEventListener('shown.bs.collapse', () => {
-      if (!mobile()) return;
-      document.body.classList.add('sk-sidebar-open');
-      menu.querySelector('a,summary').focus();
-    });
-    menu.addEventListener('hidden.bs.collapse', () => { document.body.classList.remove('sk-sidebar-open'); toggle.focus(); });
-    backdrop?.addEventListener('click', closeMenu);
+    menu.addEventListener('shown.bs.collapse', () => { if (mobile()) menu.querySelector('a,button')?.focus(); });
+    menu.addEventListener('hidden.bs.collapse', () => { if (mobile()) toggle.focus(); });
     document.addEventListener('keydown', event => {
-      if (!mobile() || !menu.classList.contains('show')) return;
-      if (event.key === 'Escape') { event.preventDefault(); closeMenu(); }
-      if (event.key === 'Tab') {
-        const items = Array.from(menu.querySelectorAll('a,summary,button')).filter(el => el.getClientRects().length);
-        const first = items[0], last = items[items.length - 1];
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-      }
+      if (event.key==='Escape' && mobile() && menu.classList.contains('show')) { event.preventDefault(); closeMenu(); }
     });
-    window.addEventListener('resize', () => { if (!mobile()) document.body.classList.remove('sk-sidebar-open'); else if(menu.classList.contains('show')) document.body.classList.add('sk-sidebar-open'); });
+    document.addEventListener('click', event => {
+      if (mobile() && menu.classList.contains('show') && !menu.contains(event.target) && !toggle.contains(event.target)) closeMenu();
+    });
   }
   let serial = 0;
   function fieldError(field) {
