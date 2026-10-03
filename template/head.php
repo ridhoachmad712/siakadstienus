@@ -48,7 +48,7 @@ $sk_body_class = isset($sk_body_class) ? $sk_body_class : '';
 	<link href="<?= $sk_base; ?>dist/css/demo.min.css" rel="stylesheet" />
 
 	<!-- Tema SIAKAD (harus paling akhir) -->
-	<link href="<?= $sk_base; ?>assets/siakad.css?v=20261003-krs-semester" rel="stylesheet" />
+	<link href="<?= $sk_base; ?>assets/siakad.css?v=20261003-login-white" rel="stylesheet" />
 </head>
 
 <body class="antialiased <?= $sk_body_class; ?>">

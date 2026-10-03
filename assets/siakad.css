@@ -766,117 +766,32 @@ small.form-hint {
 
 /* ---------- halaman login ---------- */
 body.page-login {
-	background:
-		radial-gradient(1100px 520px at 15% -10%, rgba(164, 71, 98, .45), transparent 60%),
-		linear-gradient(130deg, #331220 0%, var(--sk-navy) 45%, var(--sk-navy-2) 100%);
-	min-height: 100vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 2rem 1rem;
+    background: #fff;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
 }
-
-.sk-login {
-	width: 100%;
-	max-width: 430px;
-}
-
-.sk-login-card {
-	background: var(--sk-surface);
-	border-radius: 20px;
-	overflow: hidden;
-	box-shadow: 0 36px 80px -30px rgba(3, 9, 28, .75);
-}
-
-.sk-login-brand {
-	text-align: center;
-	padding: 2rem 1.75rem 1.5rem;
-	background: linear-gradient(135deg, var(--sk-navy) 0%, var(--sk-navy-2) 100%);
-	color: #fff;
-}
-
-.sk-login-brand img {
-	width: 74px;
-	height: 74px;
-	object-fit: contain;
-	background: rgba(255, 255, 255, .95);
-	border-radius: 18px;
-	padding: .5rem;
-	margin-bottom: .9rem;
-}
-
-.sk-login-brand h1 {
-	font-size: 1.05rem;
-	font-weight: 700;
-	letter-spacing: .01em;
-	margin: 0;
-	color: #fff;
-}
-
-.sk-login-brand p {
-	margin: .25rem 0 0;
-	font-size: .82rem;
-	color: rgba(255, 255, 255, .78);
-	text-transform: uppercase;
-	letter-spacing: .06em;
-}
-
-.sk-login-body {
-	padding: 1.75rem;
-}
-
-.sk-login-title {
-	font-size: 1.15rem;
-	font-weight: 700;
-	margin: 0;
-	color: #101828;
-}
-
-.sk-login-sub {
-	color: var(--sk-muted);
-	font-size: .82rem;
-	margin: .25rem 0 1.25rem;
-}
-
-.sk-login-body .btn-primary {
-	padding: .65rem 1rem;
-	font-size: .9rem;
-	box-shadow: 0 10px 22px -12px rgba(123, 32, 58, .9);
-}
-
-.sk-password {
-	position: relative;
-}
-
-.sk-password .form-control {
-	padding-right: 4rem;
-}
-
-.sk-password-toggle {
-	position: absolute;
-	top: 50%;
-	right: .5rem;
-	transform: translateY(-50%);
-	border: 0;
-	background: transparent;
-	color: var(--sk-primary);
-	font-size: .78rem;
-	font-weight: 600;
-	cursor: pointer;
-	padding: .25rem .4rem;
-	border-radius: 8px;
-}
-
-.sk-password-toggle:hover {
-	background: var(--sk-primary-soft);
-}
-
-.sk-login-footer {
-	text-align: center;
-	padding: .9rem 1.5rem 1.4rem;
-	color: var(--sk-muted);
-	font-size: .76rem;
-}
+.sk-login { width: 100%; max-width: 380px; }
+.sk-login-card { background: #fff; border: 0; border-radius: 0; box-shadow: none; }
+.sk-login-brand { text-align: center; padding: 0; margin-bottom: 2rem; }
+.sk-login-brand img { display: block; width: 60px; height: 60px; object-fit: contain; margin: 0 auto 1rem; }
+.sk-login-label { display: block; color: var(--sk-primary); font-size: .8rem; font-weight: 700; letter-spacing: .12em; margin-bottom: .6rem; }
+.sk-login-brand h1 { color: var(--sk-text); font-size: 1.6rem; font-weight: 700; line-height: 1.3; margin: 0; letter-spacing: -.025em; }
+.sk-login-brand p { color: var(--sk-muted); font-size: .9rem; line-height: 1.5; margin: .6rem 0 0; }
+.sk-login-body { padding: 0; }
+.sk-login-body .form-label { font-size: .875rem; margin-bottom: .5rem; }
+.sk-login-body .form-control, .sk-login-body .form-select { min-height: 46px; background-color: #fff; border-radius: 8px; }
+.sk-login-body .btn-primary { min-height: 46px; margin-top: .5rem; border-radius: 8px; font-size: .9rem; box-shadow: none; }
+.sk-password { position: relative; }
+.sk-password .form-control { padding-right: 7rem; }
+.sk-password-toggle { position: absolute; top: 50%; right: .3rem; transform: translateY(-50%); min-height: 40px; min-width: 44px; border: 0; background: transparent; color: var(--sk-primary); font-size: .78rem; font-weight: 600; cursor: pointer; padding: .25rem .6rem; border-radius: 6px; }
+.sk-password-toggle:hover { background: var(--sk-primary-soft); }
+.sk-password-toggle:focus-visible { outline: 2px solid var(--sk-primary); outline-offset: 1px; }
+.sk-login-footer { text-align: center; margin-top: 2rem; padding: 0; color: var(--sk-muted); font-size: .75rem; line-height: 1.6; }
+@media (max-width: 420px) { body.page-login { padding: 2rem 1.25rem; } .sk-login-brand h1 { font-size: 1.45rem; } }
 
 /* ---------- responsif ---------- */
 @media (max-width: 767.98px) {

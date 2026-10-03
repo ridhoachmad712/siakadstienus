@@ -29,13 +29,12 @@ include "../template/head.php";
       <?php if (!empty(nilai($r_pengaturan, 'logo_aplikasi'))) { ?>
         <img src="../img/<?= htmlspecialchars(nilai($r_pengaturan, 'logo_aplikasi'), ENT_QUOTES, 'UTF-8'); ?>" alt="Logo">
       <?php } ?>
-      <h1>Sistem Informasi Akademik</h1>
+      <span class="sk-login-label">SIAKAD</span>
+      <h1>Masuk ke akun Anda</h1>
       <p><?= htmlspecialchars(nilai($r_pengaturan, 'nama_kampus'), ENT_QUOTES, 'UTF-8'); ?></p>
     </div>
 
     <div class="sk-login-body">
-      <h2 class="sk-login-title">Masuk ke akun Anda</h2>
-      <p class="sk-login-sub">Silakan gunakan akun yang diberikan bagian akademik.</p>
 
       <?php if ($pesan_error !== '') { ?>
         <div class="alert alert-danger" role="alert"><?= $pesan_error; ?></div>
@@ -45,25 +44,25 @@ include "../template/head.php";
         <script>setTimeout(function(){ window.location.replace('dashboard'); }, 1200);</script>
       <?php } ?>
 
-      <form method="post" action="" autocomplete="off">
+      <form method="post" action="" autocomplete="on">
 <?php siakad_csrf_field(); ?>
         <div class="mb-3">
           <label class="form-label" for="username">Username</label>
-          <input type="text" id="username" name="username" class="form-control" placeholder="NIM / NIDN / username" autocomplete="off" required autofocus>
+          <input type="text" id="username" name="username" class="form-control" placeholder="NIM / NIP / username" autocomplete="username" required>
         </div>
 
         <div class="mb-3">
           <label class="form-label" for="myInput">Password</label>
           <div class="sk-password">
-            <input type="password" id="myInput" name="password" class="form-control" placeholder="Password" autocomplete="off" required>
-            <button type="button" class="sk-password-toggle" onclick="myFunction()" aria-label="Tampilkan password">Lihat</button>
+            <input type="password" id="myInput" name="password" class="form-control" placeholder="Masukkan password" autocomplete="current-password" required>
+            <button type="button" class="sk-password-toggle" onclick="myFunction(this)" aria-label="Tampilkan password" aria-controls="myInput" aria-pressed="false">Lihat</button>
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="level">Hak akses</label>
+          <label class="form-label" for="level">Masuk sebagai</label>
           <select class="form-select" id="level" name="level" required="required">
-            <option value="">- Pilih hak akses -</option>
+            <option value="">Pilih peran Anda</option>
             <option value="admin">Admin Akademik</option>
             <option value="Jurusan/Prodi">Program Studi</option>
             <option value="dosen">Dosen</option>
@@ -82,9 +81,13 @@ include "../template/head.php";
 </div>
 
 <script>
-  function myFunction() {
+  function myFunction(button) {
     var x = document.getElementById("myInput");
-    x.type = (x.type === "password") ? "text" : "password";
+    var show = x.type === "password";
+    x.type = show ? "text" : "password";
+    button.textContent = show ? "Sembunyikan" : "Lihat";
+    button.setAttribute("aria-label", show ? "Sembunyikan password" : "Tampilkan password");
+    button.setAttribute("aria-pressed", show ? "true" : "false");
   }
 </script>
 </body>
