@@ -21,8 +21,12 @@ try {
     if (!is_array($config)) throw new RuntimeException();
     foreach (['host','user','password','database'] as $key) if (!isset($config[$key]) || !is_string($config[$key])) throw new RuntimeException();
     $stage='menyiapkan skrip';
-    $temporary=tempnam($directory,'.mysql-migration-');
-    if (!$temporary || !chmod($temporary,0600)) throw new RuntimeException();
+    // Berkas biasa dibuat eksklusif; hindari pembersihan tempnam oleh hosting.
+    $temporary=$directory.'/mysql-migration-'.bin2hex(random_bytes(12)).'.cnf';
+    $handle=fopen($temporary,'x');
+    if (!$handle) throw new RuntimeException();
+    fclose($handle);
+    if (!chmod($temporary,0600)) throw new RuntimeException();
     $options=['host'=>$config['host'],'user'=>$config['user'],'password'=>$config['password'],'default-character-set'=>'utf8mb4'];
     if (preg_match('/^([^:]+):(\d+)$/D',$config['host'],$parts)) { $options['host']=$parts[1]; $options['port']=$parts[2]; }
     if (isset($config['port'])) $options['port']=(string)$config['port'];
@@ -33,6 +37,7 @@ try {
     $script="#!/usr/bin/env bash\nset -eu\numask 077\ncredentials=".$quote($temporary)."\n";
     $script.="cleanup() { rm -f -- \"\$credentials\"; }\ntrap cleanup EXIT\n";
     $script.='php '.$quote($root.'/tools/check_database.php')."\n";
+    $script.="if [ ! -r \"\$credentials\" ]; then printf 'File koneksi migrasi tidak tersedia. Jalankan prepare_migrations.php kembali.\\n'; exit 1; fi\n";
     $client=implode(' ',array_map($quote,['mysql','--defaults-extra-file='.$temporary,'--database='.$config['database']]));
     foreach ($files as $file) {
         $script.="printf '%s\\n' ".$quote('Menjalankan '.$file)."\n";
